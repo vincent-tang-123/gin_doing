@@ -1,0 +1,3 @@
+<h1>Hello Goland</h1>
+<h2> 你好 </h2>
+<img id='i1' src='https://img.xclient.info/cdn/large/006ehIt6ly1grb0jjgy8uj30rs0dx14d'>

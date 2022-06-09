@@ -1,0 +1,7 @@
+<h1 style='color:red'> www.vincent.com </h1>
+<a href="www.baidu.com", target="self">我的网站</a>
+<script>
+var a;
+a = 4
+console.log(a)
+</script>
