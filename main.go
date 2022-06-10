@@ -16,6 +16,28 @@ func main(){
 	// 指定用户使用GET请求访问/hello 时，执行 sayHello 函数
 	r.GET("/hello", sayHello)
 
+	// restful 风格路由
+	r.GET("/book", func(context *gin.Context) {
+		context.JSON(200, gin.H{
+			"method": "get",
+		})
+	})
+	r.POST("/book", func(context *gin.Context) {
+		context.JSON(200, gin.H{
+			"method": "post",
+		})
+	})
+	r.PUT("/book", func(context *gin.Context) {
+		context.JSON(200, gin.H{
+			"method": "put",
+		})
+	})
+	r.DELETE("/book", func(context *gin.Context) {
+		context.JSON(200, gin.H{
+			"method": "delete",
+		})
+	})
+
 	// 启动服务
 	r.Run(":9090")
 
