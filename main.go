@@ -1,28 +1,23 @@
 package main
 
-import (
-	"fmt"
-	"io/ioutil"
-	"net/http"
-)
-				// 响应					请求
-func sayHello(w http.ResponseWriter, r *http.Request){
-	//_, _ = fmt.Fprintln(w, "<h1>Hello Goland</h1>") // Fprintln 往 响应体中写入数据
-	b, _ := ioutil.ReadFile("./hello.txt") // ioutil.ReadFile 读取文件 返回 二进制数据， 和错误
-	_, _ = fmt.Fprintln(w, string(b)) // 打印数据
-	t , _ := ioutil.ReadFile("./test.txt")
-	_, _ = fmt.Fprintln(w, string(t))
+import "github.com/gin-gonic/gin"
 
+// gin 框架 函数参数指定为 *gin.Context
+func sayHello(c *gin.Context){
+	c.JSON(200, gin.H{
+		"message": "Hello golang",
+	})
 
 }
 
 func main(){
-	http.HandleFunc("/hello", sayHello)
-	err := http.ListenAndServe(":9090", nil)
-	if err != nil{
-		fmt.Printf("http server failed , err:%v\n", err)
-		return
-	}
+	// 创建一个默认的路由引擎
+	r := gin.Default()
+	// 指定用户使用GET请求访问/hello 时，执行 sayHello 函数
+	r.GET("/hello", sayHello)
+
+	// 启动服务
+	r.Run(":9090")
 
 }
 
