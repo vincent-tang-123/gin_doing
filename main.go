@@ -1,6 +1,9 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
 // gin 框架 函数参数指定为 *gin.Context
 func sayHello(c *gin.Context){
@@ -38,6 +41,44 @@ func main(){
 		})
 	})
 
+	// go 语言返回 json 数据
+	r.GET("/json", func(context *gin.Context) {
+		// 方法1 ：使用的是 map
+		//data := map[string]interface{}{
+		//	"name": "vincent",
+		//	"message": "hello world",
+		//	"age": 18,
+		//}
+
+		//data := gin.H{
+		//	"name": "小王子",
+		//	"message": "hello world",
+		//	"age": 18,
+		//}
+
+		// 方法二： 使用结构体 灵活使用 tag 来对结构体字段做定制化操作
+		type msg struct{ // 定义结构体字段
+			 Name string `json:"name"` // 首字母小写 不可导出 可以打 tag
+			 Message string `json:"message"`
+			 Age int `json:"age"`
+		}
+
+		data := msg{ // 示例化结构体
+			"小王子",
+			"hello world",
+			18,
+		}
+
+		context.JSON(http.StatusOK, data) // json 的序列化
+		/*
+		{
+		    "name": "小王子",
+		    "message": "hello world",
+		    "age": 18
+		}
+		*/
+
+	})
 	// 启动服务
 	r.Run(":9090")
 
