@@ -1,35 +1,50 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"net/http"
+	"fmt"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-// querystring
+// UserInfo --> 数据表
+type UserInfo struct {
+	ID uint
+	Name string
+	Gender string
+	Hobby string
+}
 
 func main(){
-	r := gin.Default()
+	// 连接 Mysql 数据库
+	db, err := gorm.Open("mysql",
+		"root:521314td@(127.0.0.1:3306)/db1?charset=utf8mb4&parseTime=True&loc=Local")
+	if err !=nil {
+		panic(err)
+	}
+	defer db.Close()
 
-	// GET 请求 URL ？后面是 querystring 参数
-	// key=value 格式 ，多个 key-value 用 & 符号连接
-	// eg: http://127.0.0.1:9090/web?query=vincent&age=19
-	r.GET("/web", func(context *gin.Context) {
-		// 获取浏览器那边发请求携带的的 query string 参数
-		name := context.Query("query") // 通过 Query 获取请求中的 querystring
-		age := context.Query("age")
-		//name := context.DefaultQuery("query", "somebody") // 取不到就用指定的默认值
-		//name, ok := context.GetQuery("query") // 取不到 第二个参数就返回 false
-		//if !ok{
-		//	// 取不到
-		//	name = "somebody"
-		//}
-		context.JSON(http.StatusOK, gin.H{
-			"name": name,
-			"age": age,
-		})
+	// 创建表 自动迁移 (把结构体和数据表进行对应)
+	//db.AutoMigrate(&UserInfo{})
 
-	})
+	//// 创建数据行
+	//u1 := UserInfo{1, "提米", "男", "play"}
+	//db.Create(&u1)
 
-	r.Run(":9090")
+	// 查询
+	var u UserInfo
+	db.First(&u) // 查询表中的第一条数据 保存到 u 中
+	fmt.Printf("%#v\n", u) //main.UserInfo{ID:0x1, Name:"提米", Gender:"男", Hobby:"play"}
+	fmt.Println(u.ID, u.Name, u.Gender, u.Hobby)
+
+	// 更新
+	db.Model(&u).Update("hobby", "篮球")
+	fmt.Println(u.ID, u.Name, u.Gender, u.Hobby) // 1 提米 男 篮球
+
+	// 删除
+	db.Delete(&u)
+
+
+
+
 }
 
