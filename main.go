@@ -1,40 +1,17 @@
 package main
 
 import (
-	"database/sql"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"time"
 )
 
-// 定义模型
+// 1 定义模型
 
 type User struct {
-	// 内嵌 gorm.Model
-	gorm.Model // 继承 id ， 创建时间， 更新时间 删除时间字段
-	Name string
-	Age sql.NullInt64
-	Birthday *time.Time
-	Email string `gorm:"type:varchar(100);unique_index"` // 唯一约束
-	Role string `gorm:"size:255"` // 设置字段大小为 255
-	MemberNumber *string `gorm:"unique;not null"` // 设置会员号 唯一且不为空
-	Num int `gorm:"AUTO_INCREMENT"` // 设置 字段为自增类型
-	Address string `gorm:"index:addr"` // 给 address 字段创建名为 addr 的索引
-	IgnoreMe int `gorm:"-"` // 忽略本字段
-}
-
-// 使用 AnimalID 作为主键 默认生成的表名复数 Animals
-
-type Animal struct {
-	AnimalID int64 `gorm:"primary_key;column:beast_id"` // gorm 自定义列名
-	Name 	 string `gorm:"column:day_of_beast"` // gorm 自定义列名
-	Age      int64 `gorm:"column:age_of_the_beast"`
-}
-
-// 重命名表名 将 Animal 表名转换成 vincent
-
-func (Animal)TableName() string{
-	return "vincent"
+	ID int64
+	Name string `gorm:"default:'小王子'"`  // 用 tag 给模型设置 默认值
+	Age int64
 }
 
 func main(){
@@ -47,12 +24,16 @@ func main(){
 	defer db.Close()
 	db.SingularTable(true) // 禁用表名复数
 
-	// 创建表 自动迁移 (把结构体和数据表进行对应)
+	// 2 创建表 自动迁移 (把结构体和数据表进行对应)  把模型与数据库中的表对应起来
 	db.AutoMigrate(&User{})
-	db.AutoMigrate(&Animal{})
 
-	// 使用 User 结构体创建表名叫 xiaowangzi 的表
-	db.Table("xiaowangzi").CreateTable(&User{})
+	// 3 新增数据 创建结构体实例
+	u := User{Name: "", Age: 38} // 在代码层面创建一个 user 对象
+	fmt.Println(db.NewRecord(&u)) // 判断主键是否为空  true
+	db.Debug().Create(&u)  // 创建一条数据 Debug 打印sql 日志
+	fmt.Println(db.NewRecord(&u)) // 判断主键是否为空 false
+
+
 
 
 
