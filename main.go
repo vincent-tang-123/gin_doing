@@ -55,6 +55,7 @@ func main(){
 	//db.Debug().Attrs(User{Age: 88}).FirstOrInit(&user, User{Name: "echo1"}) // SELECT * FROM `user`  WHERE `user`.`deleted_at` IS NULL AND ((`user`.`name` = 'echo1')) ORDER BY `user`.`id` ASC LIMIT 1
 
 	// Assign 无论 echo1 是否找的到 都会为该数据的 Age 字段赋一个值
+
 	db.Debug().Assign(User{Age: 11}).FirstOrInit(&user, User{Name: "echo1"}) // SELECT * FROM `user`  WHERE `user`.`deleted_at` IS NULL AND ((`user`.`name` = 'echo1')) ORDER BY `user`.`id` ASC LIMIT 1
 	fmt.Printf("user:%#v\n", user)
 
