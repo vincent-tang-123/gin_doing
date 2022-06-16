@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -48,16 +47,40 @@ func main(){
 	//fmt.Printf("users:%#v\n", users)
 
 	// FirstOrInit
+	//var user User
+	//db.Debug().FirstOrInit(&user, User{Name: "echo"}) // SELECT * FROM `user`  WHERE `user`.`deleted_at` IS NULL AND ((`user`.`name` = 'echo')) ORDER BY `user`.`id` ASC LIMIT 1
+	//
+	//// Attrs 如果找 echo1 找不到 就会常见一天 echo1 的数据 且将 Age 字段属性赋值为 88
+	////db.Debug().Attrs(User{Age: 88}).FirstOrInit(&user, User{Name: "echo1"}) // SELECT * FROM `user`  WHERE `user`.`deleted_at` IS NULL AND ((`user`.`name` = 'echo1')) ORDER BY `user`.`id` ASC LIMIT 1
+	//
+	//// Assign 无论 echo1 是否找的到 都会为该数据的 Age 字段赋一个值
+	//
+	//db.Debug().Assign(User{Age: 11}).FirstOrInit(&user, User{Name: "echo1"}) // SELECT * FROM `user`  WHERE `user`.`deleted_at` IS NULL AND ((`user`.`name` = 'echo1')) ORDER BY `user`.`id` ASC LIMIT 1
+	//fmt.Printf("user:%#v\n", user)
+
 	var user User
-	db.Debug().FirstOrInit(&user, User{Name: "echo"}) // SELECT * FROM `user`  WHERE `user`.`deleted_at` IS NULL AND ((`user`.`name` = 'echo')) ORDER BY `user`.`id` ASC LIMIT 1
+	db.First(&user)
+	//user.Name = "suiguohui"
+	//user.Age = 17
+	//db.Debug().Save(&user) // 默认会修改所有字段  UPDATE `user` SET `created_at` = '2022-06-15 17:48:21',
+	// `updated_at` = '2022-06-16 21:00:11', `deleted_at` = NULL, `name` = 'suiguohui', `age` = 17  WHERE `user`.`deleted_at` IS NULL AND `user`.`id` = 1
 
-	// Attrs 如果找 echo1 找不到 就会常见一天 echo1 的数据 且将 Age 字段属性赋值为 88
-	//db.Debug().Attrs(User{Age: 88}).FirstOrInit(&user, User{Name: "echo1"}) // SELECT * FROM `user`  WHERE `user`.`deleted_at` IS NULL AND ((`user`.`name` = 'echo1')) ORDER BY `user`.`id` ASC LIMIT 1
+	// 更新单独字段
+	db.Debug().Model(&user).Update("Name", "vincent111") //  UPDATE `user` SET `name` = 'vincent111', `updated_at` = '2022-06-16 21:08:21'  WHERE `user`.`deleted_at` IS NULL AND `user`.`id` = 1
 
-	// Assign 无论 echo1 是否找的到 都会为该数据的 Age 字段赋一个值
+	// 更新多个字段
+	db.Debug().Model(&user).Updates(map[string]interface{}{"name": "hello", "age": 18}) // UPDATE `user` SET `age` = 18, `name` = 'hello', `updated_at` = '2022-06-16 21:12:40'  WHERE `user`.`deleted_at` IS NULL AND `user`.`id` = 1
 
-	db.Debug().Assign(User{Age: 11}).FirstOrInit(&user, User{Name: "echo1"}) // SELECT * FROM `user`  WHERE `user`.`deleted_at` IS NULL AND ((`user`.`name` = 'echo1')) ORDER BY `user`.`id` ASC LIMIT 1
-	fmt.Printf("user:%#v\n", user)
+	db.Debug().Model(&user).Updates(map[string]interface{}{"name": "", "age": 0}) // UPDATE `user` SET `age` = 0, `name` = '', `updated_at` = '2022-06-16 21:29:48'  WHERE `user`.`deleted_at` IS NULL AND `user`.`id` = 1
+
+	// 去掉钩子函数影响 只更新 age 字段值
+	db.Debug().Model(&user).UpdateColumn("age", 100) // UPDATE `user` SET `age` = 100  WHERE `user`.`deleted_at` IS NULL AND `user`.`id` = 1
+
+	// 让 users 表中所有用户的年龄在原来的基础上 + 2
+	db.Debug().Model(&User{}).Update("age", gorm.Expr("age+?", 2)) // UPDATE `user` SET `age` = age+2, `updated_at` = '2022-06-16 21:50:02'  WHERE `user`.`deleted_at` IS NULL
+
+
+
 
 
 
